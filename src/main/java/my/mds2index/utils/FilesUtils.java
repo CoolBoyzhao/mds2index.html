@@ -1104,7 +1104,7 @@ public class FilesUtils {
 
 						// 生成的html文件存放目录
 						String childHtmlFilePath = filePath + File.separator + fileChildren.getName().replace(".md", ".html");
-						System.out.println("生成文件路径");
+						System.out.println("生成文件路径  "+ childHtmlFilePath);
 						newFileUtf8(childHtmlFilePath, mdIndexHtml);
 					}
 				} else {//

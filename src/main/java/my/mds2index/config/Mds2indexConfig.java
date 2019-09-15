@@ -340,6 +340,7 @@ public class Mds2indexConfig {
 		Dir dir = new Dir();
 		dir.setDirName(file.getName());
 		dir.setFileType(0);
+		dir.setPath("#");
 
 		List<Dir> listDir = new ArrayList<Dir>();
 		//String path = prefix + "#";
@@ -356,9 +357,16 @@ public class Mds2indexConfig {
 					try {
 						
 						if (children.isDirectory()) {
-							dir1 = getMenuJsonDir(children,prefixPath + File.separator + children.getName());
-							prefixPath = prefixPath + File.separator + children.getName();
-							path = prefixPath;
+							if(!"".equals(prefixPath)) {
+								dir1 = getMenuJsonDir(children,prefixPath  + children.getName() + File.separator);
+								prefixPath = prefixPath  + children.getName() + File.separator;
+								path = prefixPath;
+							}else {
+								dir1 = getMenuJsonDir(children,children.getName()+File.separator);
+								prefixPath = children.getName() + File.separator;
+							    path = prefixPath;
+							}
+							
 							
 						} else {
 							// 获取文件后缀
@@ -367,8 +375,8 @@ public class Mds2indexConfig {
 							String prefix = children.getName().substring(0,children.getName().lastIndexOf("."));
 							
 							if("md".equals(suffix)){
-								if("".equals(prefixPath)) {
-									path = prefixPath + File.separator + prefix + ".html";
+								if(!"".equals(prefixPath)) {
+									path = prefixPath + prefix + ".html";
 								}else {
 									path =prefix + ".html";
 								}
