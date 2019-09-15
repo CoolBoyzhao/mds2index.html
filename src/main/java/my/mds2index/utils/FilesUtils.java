@@ -17,6 +17,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.StringTokenizer;
 import my.mds2index.config.Dir;
+import my.mds2index.config.Mds2indexConfig;
 
 /**
  * FilesUtil
@@ -67,7 +68,7 @@ public class FilesUtils {
 					stringBuilder.append(data).append("\n");
 				}
 				bufferedReader.close();
-				
+
 			} catch (Exception e) {
 				return "";
 			}
@@ -120,7 +121,7 @@ public class FilesUtils {
 						i++;
 					}
 				}
-				//进行流的关闭
+				// 进行流的关闭
 				bufferedReader.close();
 			} catch (Exception e) {
 				return "";
@@ -229,7 +230,7 @@ public class FilesUtils {
 			OutputStreamWriter osw = new OutputStreamWriter(fos, "UTF-8");
 			osw.write(fileContent);
 			osw.flush();
-			//进行流的关闭
+			// 进行流的关闭
 			osw.close();
 			return true;
 		} catch (Exception e) {
@@ -999,88 +1000,142 @@ public class FilesUtils {
 		}
 		return isSucceed;
 	}
-	
+
 	/**
-	 * 获取目录结构信息
-	 * @Title: getDir   
-	 * @Description: TODO()   
-	 * @param: @return      
-	 * @return: Dir      
-	 * @throws
+	 * 获取目录结构信息 @Title: getDir @Description: TODO() @param: @return @return:
+	 * Dir @throws
 	 */
-	public static Dir getAllDirName(File file,int i) {
-		//根路径
+	public static Dir getAllDirName(File file) {
+		// 根路径
 		Dir dir = new Dir();
-		i = i+1;
 		dir.setFileType(0);
-		//设置文件夹的层级，0表示根路径
-		dir.setHierarchy(i-1);
-		
+		// 设置文件夹的层级，0表示根路径
+
 		List<Dir> listDir = new ArrayList<Dir>();
 		String path = file.getPath();
-		if(!file.exists()) {
+		if (!file.exists()) {
 			dir.setState(1);
 			return dir;
-		}else {
+		} else {
 			dir.setDirName(file.getName());
-			dir.setPath(path);	
+			dir.setPath(path);
 			File[] files = file.listFiles();
-			
-			if(files.length>0) {
-				for(File childen:files) {
+
+			if (files.length > 0) {
+				for (File children : files) {
 					Dir dir1 = new Dir();
 					try {
-						dir1.setDirName(childen.getName());
-						dir1.setPath(childen.getPath());
-						dir1.setHierarchy(i);
-						if(childen.isDirectory()) {
-							dir1 = getAllDirName(childen,i);
-						}else {
+						dir1.setDirName(children.getName());
+						dir1.setPath(children.getPath());
+						if (children.isDirectory()) {
+							dir1 = getAllDirName(children);
+						} else {
 							dir1.setFileType(1);
 						}
 						listDir.add(dir1);
-					}catch(Exception e) {
+					} catch (Exception e) {
 						continue;
 					}
-					
+
 				}
 				dir.setChildren(listDir);
-				
+
 			}
-			
+
 		}
-		return dir;	
-	}	
-	
+		return dir;
+	}
+
 	/**
-	 * 获取层级目录文件名（打印输出效果）
-	 * @Title: getDirName   
-	 * @Description: TODO()   
-	 * @param: @param dir      
-	 * @return: void      
-	 * @throws
+	 * 获取层级目录文件名（打印输出效果） @Title: getDirName @Description: TODO() @param: @param
+	 * dir @return: void @throws
 	 */
-	public static void getDirName(Dir dir){
-		System.out.println("文件夹路径:---------"+dir.getPath());
-		System.out.println("文件夹名称:---------"+dir.getDirName());
-		System.out.println("文件夹层级：---------"+dir.getHierarchy());
-		System.out.println("文件夹类型:---------"+dir.getFileType());
-		for(Dir childen : dir.getChildren()){
+	public static void getDirName(Dir dir) {
+		System.out.println("文件夹路径:---------" + dir.getPath());
+		System.out.println("文件夹名称:---------" + dir.getDirName());
+		System.out.println("文件夹层级：---------" + dir.getHierarchy());
+		System.out.println("文件夹类型:---------" + dir.getFileType());
+		for (Dir children : dir.getChildren()) {
 			try {
-				// childen.getPath();
-				   if(childen.getFileType()==0) {
-					   getDirName(childen);
-				   }else {
-					   System.out.println("文件路径++++++++++++"+childen.getPath());
-					   System.out.println("文件路径++++++++++++"+childen.getDirName());
-					   System.out.println("文件层级++++++++++++"+childen.getHierarchy());
-					   System.out.println("文件夹类型:++++++++++"+childen.getFileType());
-				   }
-			}catch(Exception e) {
+				// children.getPath();
+				if (children.getFileType() == 0) {
+					getDirName(children);
+				} else {
+					System.out.println("文件路径++++++++++++" + children.getPath());
+					System.out.println("文件路径++++++++++++" + children.getDirName());
+					System.out.println("文件层级++++++++++++" + children.getHierarchy());
+					System.out.println("文件夹类型:++++++++++" + children.getFileType());
+				}
+			} catch (Exception e) {
 				continue;
 			}
-		  
+
 		}
-		
+
 	}
+
+	/**
+	 * 使用递归根据md根路径和html根路径生成html文件 @Title: createHtmlByRootPath @Description:
+	 * TODO(根据路径信息) @param: @param rootPath @param: @param
+	 * filePath @param: @return @return: boolean @throws
+	 */
+	private static boolean createHtml(String rootPath, String filePath,String projectPath) {
+		boolean flag = true;
+		FilesUtils.newFolder(filePath);
+		File file = new File(rootPath);
+		if (file.exists() && file.isDirectory()) {
+			File[] files = file.listFiles();
+			for (File fileChildren : files) {// 遍历文件夹下的文件和文件夹
+				if (fileChildren.isFile()) {// 如果得到的是文件，则生成HTML文件
+					// 获取文件后缀
+					String suffix = fileChildren.getName().substring(fileChildren.getName().lastIndexOf(".") + 1);
+
+					if ("md".equals(suffix)) {// 如果是markdown文件
+						// 读取html模板
+						String tplPath = Mds2indexConfig.getMenuTplPath();
+						System.out.println("模板路径：" + tplPath);
+						System.out.println(">>>>>>>>>>>>>>>>>>>>读取模板文件...");
+						String tplStr = FilesUtils.readAll(tplPath);
+						// 根据html模板生成包含数据的html字符串
+						System.out.println(">>>>>>>>>>>>>>>>>>>>解析渲染为带索引的单页面index.html内容...");
+						String mdIndexHtml = Md2HtmlUtils.parsePageByParamSingleFile(tplStr, fileChildren.getPath(),
+								projectPath);
+						System.out.println(">>>>>>>>>>>>>>>>>>>>解析渲染为带索引的单页面index.html内容结束！！！");
+
+						// 生成的html文件存放目录
+						String childHtmlFilePath = filePath + File.separator + fileChildren.getName().replace(".md", ".html");
+						System.out.println("生成文件路径  "+ childHtmlFilePath);
+						newFileUtf8(childHtmlFilePath, mdIndexHtml);
+					}
+				} else {//
+
+					createHtml(rootPath +File.separator+ fileChildren.getName(), filePath + File.separator + fileChildren.getName(),projectPath);
+
+				}
+			}
+
+		} else {
+			// 出错
+			flag = false;
+			System.out.println("转换文件" + filePath + "出错");
+		}
+
+		return flag;
+
+	}
+
+	/**
+	 * 根据md根路径生成html @Title: createHtmlByRootPath @Description:
+	 * TODO() @param: @param rootPath @param: @return @return: boolean @throws
+	 */
+	public static boolean createHtmlByRootPath(String rootPath) {
+		// 拼接html存放根目录
+		rootPath = new File(rootPath).getPath();
+		String filePath = rootPath + "html";
+		//FilesUtils.newFolder(filePath);
+		// 调用生成html方法，生成文件
+		return createHtml(rootPath, filePath,rootPath);
+
+	}
+
 }

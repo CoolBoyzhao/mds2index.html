@@ -14,6 +14,8 @@ public class MainApp1 {
      *             args3[输出文件路径，默认 ../output/index.html]
      */
     public static void main(String[] args) {
+    	
+    	
         System.out.println("==================开始执行markdown文档转化为带索引的单页面index.html!!=================");
 
         System.out.println(">>>>>>>>>>传入参数检查...");
@@ -36,24 +38,13 @@ public class MainApp1 {
                 Mds2indexConfig.put("page.indexPath", args[3]);
             }
         }
-        System.out.println(">>>>>>>>>>传入参数检查完毕！！");
-        String tplPath = Mds2indexConfig.getMenuTplPath();
-        System.out.println("模板路径：" + tplPath);
-        System.out.println(">>>>>>>>>>>>>>>>>>>>读取模板文件...");
-        String tplStr = FilesUtils.readAll(tplPath);
-        System.out.println(">>>>>>>>>>>>>>>>>>>>读取模板文件完毕！！！");
-        System.out.println(">>>>>>>>>>>>>>>>>>>>解析渲染为带索引的单页面index.html内容...");
-        String mdIndexHtml = Md2HtmlUtils.parsePageByParam(tplStr);
-        System.out.println(">>>>>>>>>>>>>>>>>>>>解析渲染为带索引的单页面index.html内容结束！！！");
-        System.out.println("########################################################################");
-        System.out.println(mdIndexHtml);
-        System.out.println("########################################################################");
-        //String indexPath = Mds2indexConfig.getIndexPath();
-        String indexPath = Mds2indexConfig.getIndexPath();
-        System.out.println(">>>>>>>>>>>>>>>>>>>>保存生成index.html文件...");
-        System.out.println("生成文件路径：" + indexPath);
-        FilesUtils.newFileUtf8(indexPath, mdIndexHtml);
-        System.out.println(">>>>>>>>>>>>>>>>>>>>保存生成index.html文件结束！！！");
-        System.out.println("==================结束执行markdown文档转化为带索引的单页面index.html!!==================");
+       
+        //项目根目录
+        String rootPath="E:\\markdown文本测试\\众创平台";
+        
+        FilesUtils.createHtmlByRootPath(rootPath);
+        
+        
+        //文件目录
     }
 }
